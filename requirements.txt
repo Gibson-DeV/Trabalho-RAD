@@ -1,0 +1,2 @@
+﻿CTkListbox==0.10
+packaging==23.2
