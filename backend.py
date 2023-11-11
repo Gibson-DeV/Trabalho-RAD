@@ -9,10 +9,10 @@ def connectDb():
     db.close()
 
 #Insert data in table task_tb
-def insertData(taskt_name_col, responsible_col, status_col, date_col):
+def insertData(task_name_col, responsible_col, status_col, date_col):
     connectDb = sqlite3.connect("RAD.DB")
     cursor = connectDb.cursor()
-    cursor.execute("INSERT INTO task_tb VALUES(NULL,?,?,?,?)",(taskt_name_col,responsible_col, status_col, date_col))
+    cursor.execute("INSERT INTO tasks_tb VALUES(NULL,?,?,?,?)",(task_name_col,responsible_col, status_col, date_col))
     connectDb.commit()
     connectDb.close()
 
@@ -30,7 +30,7 @@ def select(task_name ="", responsible=""):
 def delete(id):
     connectDb = sqlite3.connect("RAD.DB")
     cursor = connectDb.cursor()
-    cursor.execute("DELETE FROM task_tb WHERE id=?",(id,))
+    cursor.execute("DELETE FROM tasks_tb WHERE id=?",(id,))
     connectDb.commit()
     connectDb.close()
 
@@ -38,7 +38,7 @@ def delete(id):
 def update(id, task_name, responsible, status, date):
     connectDb = sqlite3.connect("RAD.db")
     cursor = connectDb.cursor()
-    cursor.execute("UPDATE task_tb SET task_name_col=?, responsible_col=?, status_col=?,date_col=? WHERE id=?",
+    cursor.execute("UPDATE tasks_tb SET task_name_col=?, responsible_col=?, status_col=?,date_col=? WHERE id=?",
                    (task_name,responsible,status,date,id))
     connectDb.commit()
     connectDb.close()

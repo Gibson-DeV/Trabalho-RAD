@@ -23,7 +23,7 @@ def search_command():
         list1.insert(END, row)
 
 def add_command():
-    backend.insertData(taskt_name_col=row_title.get(), responsible_col=row_responsible.get(), status_col=row_status.get(), date_col=row_date.get())
+    backend.insertData(task_name_col=row_title.get(), responsible_col=row_responsible.get(), status_col=row_status.get(), date_col=row_date.get())
     list1.delete(0, END)
     for row in backend.select():
         list1.insert(END, row)
