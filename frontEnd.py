@@ -1,30 +1,36 @@
-from tkinter import END, Tk, Label, StringVar, Entry, Listbox, Scrollbar, Button
+from tkinter import END, Button, Entry, Listbox, Scrollbar, StringVar
+
+import customtkinter as ctk
+from CTkListbox import CTkListbox
+
 import backend as backend
+
+# System, Dark, Light
+ctk.set_appearance_mode("Dark")
+
+mode = ctk.get_appearance_mode()
 
 selected_tuple = None
 
-def get_selected_row(event):
+def get_selected_row(selected_option):
     global selected_tuple
-    index = list1.curselection()[0]
-    selected_tuple = list1.get(index)
-    e1.delete(0, END)
-    e1.insert(END, selected_tuple[1])
-    e2.delete(0, END)
-    e2.insert(END, selected_tuple[2])
-    e3.delete(0, END)
-    e3.insert(END, selected_tuple[3])
-    e4.delete(0, END)
-    e4.insert(END, selected_tuple[4])
-
+    selected_tuple = selected_option
+    for index, value in enumerate(selected_option):
+        if index > 0:
+            entry = globals().get(f"e{index}")
+            entry.delete(0, END)
+            entry.insert(END, value)
 
 def search_command():
-    list1.delete(0, END)
-    for row in backend.select(task_name=row_title.get(), responsible=row_responsible.get()):
-        list1.insert(END, row)
+    list1.delete("all")
+    data = backend.select(task_name=row_title.get(), responsible=row_responsible.get())
+    lenght = len(data)
+    for index, row in enumerate(data):
+        list1.insert(END if index == lenght else index, row)
 
-def add_command():
+def add_command(_):
     backend.insertData(task_name_col=row_title.get(), responsible_col=row_responsible.get(), status_col=row_status.get(), date_col=row_date.get())
-    list1.delete(0, END)
+    list1.delete("all")
     for row in backend.select():
         list1.insert(END, row)
     e1.delete(0, END)
@@ -38,6 +44,7 @@ def delete_command():
     e2.delete(0, END)
     e3.delete(0, END)
     e4.delete(0, END)
+    search_command()
 
 
 def update_command():
@@ -46,14 +53,13 @@ def update_command():
     e2.delete(0, END)
     e3.delete(0, END)
     e4.delete(0, END)
-
     search_command()
 
 
-root = Tk()
+root = ctk.CTk()
 root.title("**** TASKS LIST *****")
-width = 840
-height = 260
+width = 630
+height = 335
 
 # coletando informações do monitor
 sc_width = root.winfo_screenwidth()
@@ -64,57 +70,52 @@ y = (sc_height/2) - (height/2)
 # tamanho da janela principal
 root.geometry("%dx%d+%d+%d" % (width, height, x, y))
 root.resizable(0, 0)
-root.config(bg='#91a38f')
 
-l1 = Label(root, text="Tarefa", bg='#91a38f', fg='#6006ff')
-l1.grid(row=0, column=0)
-l2 = Label(root, text="Responsável", bg='#91a38f', fg='#6006ff')
-l2.grid(row=0, column=2)
-l3 = Label(root, text="Status", bg='#91a38f', fg='#6006ff')
-l3.grid(row=2, column=0)
-l4 = Label(root, text="Data", bg='#91a38f', fg='#6006ff')
-l4.grid(row=2, column=2)
+# Labels
+l1 = ctk.CTkLabel(root, text="Tarefa")
+l1.grid(row=0, column=0, pady=10, sticky="e")
+l2 = ctk.CTkLabel(root, text="Responsável")
+l2.grid(row=0, column=2, sticky="e")
+l3 = ctk.CTkLabel(root, text="Status")
+l3.grid(row=2, column=0, sticky="e")
+l4 = ctk.CTkLabel(root, text="Data")
+l4.grid(row=2, column=2, sticky="e")
 
+# Entries
 row_title = StringVar()
-e1 = Entry(root, textvariable=row_title)
+e1 = ctk.CTkEntry(root, 165, 24, textvariable=row_title, corner_radius=4, border_width=1)
 e1.grid(row=0, column=1)
 row_responsible = StringVar()
-e2 = Entry(root, textvariable=row_responsible)
-e2.grid(row=0, column=3)
+e2 = ctk.CTkEntry(root, 165, 24, textvariable=row_responsible, corner_radius=4, border_width=1)
+e2.grid(row=0, column=3, padx=10, sticky="e")
 row_status = StringVar()
-e3 = Entry(root, textvariable=row_status)
+e3 = ctk.CTkEntry(root, 165, 24, textvariable=row_status, corner_radius=4, border_width=1)
 e3.grid(row=2, column=1)
 row_date = StringVar()
-e4 = Entry(root, textvariable=row_date)
-e4.grid(row=2, column=3)
+e4 = ctk.CTkEntry(root, 165, 24, textvariable=row_date, corner_radius=4, border_width=1)
+e4.grid(row=2, column=3, padx=10, sticky="e")
 
-list1 = Listbox(root, height=8, width=55)
-list1.grid(row=6, column=0, rowspan=6, columnspan=2)
+# Listbox
+color = "#1b1f22" if mode == "Light" else "#fff"
+list1 = CTkListbox(root, 220, 400, text_color=color, border_width=1)
+list1.grid(columnspan=3, padx=10, pady=10)
+list1.configure(command=get_selected_row)
 
-sb1 = Scrollbar(root)
-sb1.grid(row=6, column=2, rowspan=6)
+# Buttons
+b1 = ctk.CTkButton(root, 165, text="Incluir", corner_radius=1, fg_color="#198754", hover_color="#157347", text_color="#fff", command=add_command)
+b1.grid(row=3, column=3, pady=10, sticky="n")
 
-list1.configure(yscrollcommand=sb1.set)
-sb1.configure(command=list1.yview)
+b2 = ctk.CTkButton(root, 165, text="Atualizar Selecionado", corner_radius=1, fg_color="#f8f9fa", hover_color="#d3d4d5", text_color="#494949", command=update_command)
+b2.grid(row=3, column=3, pady=46, sticky="n")
 
-list1.bind('<<ListboxSelect>>', get_selected_row)
+b3 = ctk.CTkButton(root, 165, text="Exibir todos", corner_radius=1, fg_color="#f8f9fa", hover_color="#d3d4d5", text_color="#494949", command=search_command)
+b3.grid(row=3, column=3, pady=82, sticky="n")
 
-b1 = Button(root, text="Exibir todos", width=22,
-            bg="snow", command=search_command)
-b1.grid(row=6, column=4)
+b4 = ctk.CTkButton(root, 165, text="Deletar Selecionado", corner_radius=1, fg_color="#dc3545", hover_color="#bb2d3b", text_color="#fff", command=delete_command)
+b4.grid(row=3, column=3, pady=118, sticky="n")
 
-b3 = Button(root, text="Incluir", width=22, bg="royal blue1", command=add_command)
-b3.grid(row=5, column=4)
-
-b4 = Button(root, text="Atualizar Selecionado",
-            width=22, bg="snow", command=update_command)
-b4.grid(row=5, column=5)
-
-b5 = Button(root, text="Deletar Selecionado",
-            bg="firebrick4", width=22, command=delete_command)
-b5.grid(row=6, column=5)
-
-b6 = Button(root, text="Fechar", width=22, bg="red", command=root.destroy)
-b6.grid(row=8, column=5)
+b5_font = ctk.CTkFont(size=18)
+b5 = ctk.CTkButton(root, 165, text="Fechar", corner_radius=1, fg_color="#6c757d", hover_color="#5c636a", text_color="#fff", font=b5_font, command=root.destroy)
+b5.grid(row=3, column=3, pady=15, ipady=10, sticky="s")
 
 root.mainloop()
