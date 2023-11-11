@@ -17,10 +17,35 @@ def insertData(task_name_col, responsible_col, status_col, date_col):
     connectDb.close()
 
 #Find for task_name and responsible
-def select(task_name ="", responsible=""):
+def select(task_name=None, responsible=None):
     connectDb = sqlite3.connect("RAD.db")
     cursor = connectDb.cursor()
-    cursor.execute("SELECT * FROM tasks_tb WHERE task_name_col=? OR responsible_col=?", (task_name, responsible))
+
+    if not task_name:
+        task_name = None
+
+    if not responsible:
+        responsible = None
+
+    query = "SELECT * FROM tasks_tb"
+    parameters = []
+
+    if task_name or responsible:
+        query += " WHERE"
+
+    if task_name is not None:
+        query += " task_name_col = ?"
+        parameters.append(task_name)
+
+    if responsible is not None:
+        if task_name is not None:
+            query += " OR"
+
+        query += " responsible_col = ?"
+        parameters.append(responsible)
+
+    cursor.execute(query, tuple(parameters))
+
     #Recover all rows
     allRows = cursor.fetchall()
     connectDb.close()

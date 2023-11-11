@@ -38,7 +38,7 @@ def delete_command():
     e2.delete(0, END)
     e3.delete(0, END)
     e4.delete(0, END)
-   
+
 
 def update_command():
     backend.update(selected_tuple[0], task_name=row_title.get(), responsible=row_responsible.get(), status=row_status.get(), date=row_date.get())
@@ -46,7 +46,9 @@ def update_command():
     e2.delete(0, END)
     e3.delete(0, END)
     e4.delete(0, END)
-   
+
+    search_command()
+
 
 root = Tk()
 root.title("**** TASKS LIST *****")
